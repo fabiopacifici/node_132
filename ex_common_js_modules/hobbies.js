@@ -9,7 +9,9 @@ function getHobbies(hobbyOne, hobbyTwo, hobbyThree) {
 }
 
 function getHobbiesRev(...hobbies) {
-  return { hobbies: hobbies }
+  return { hobbies }
 }
+
+//getHobbiesRev('coding', 'coding', 'coding', 'coding', 'tv series')
 
 module.exports = getHobbies
