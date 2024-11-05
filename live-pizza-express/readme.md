@@ -439,3 +439,178 @@ module.exports = {
 ```
 
 Let's test it in postman or in the browser and we are done!
+
+## CRUD (C) - Create a new a new pizza
+
+In this section I will be showing you how to add a new pizza. I will be using Postman for this.
+
+Let's start by creating a new route in our routes file that will handle the incoming request and the data we want to send.
+
+```js
+
+
+// routes/pizza.js
+router.post("/pizze", PizzaController.create)
+
+```
+
+The route must use the post method to handle the incoming data.
+
+Now let's create a new controller method for this route.
+
+```js
+const store = (req, res) => {
+  // add the pizza to our menu array
+}
+```
+
+In the store function we will be adding the data that is sent in the request body and then pushing it into the menu array.
+The first thing we should do is to check if we can read the request body to do that le'ts add a console.log
+of the `req.body`
+
+```js
+const store = (req, res) => {
+  // add the pizza to our menu array
+  console.log(req.body);
+}
+```
+
+Before this can work we need to export the method, so we need to update the export in our controller file.
+
+```js
+
+module.exports = {
+  index,
+  show,
+  create
+}
+```
+
+Now let's add a new pizza and see if it works!
+
+**Add a pizza**
+To test this we will use postman. In the body section of the request I will be sending a json object with the name and ingredients property.
+
+Open postman and in the body tab and select raw and then select JSON (application/json).
+
+```json
+{
+    "name": "5 formaggi",
+    "ingredients": [
+        "pomodoro",
+        "mozzarella",
+        "gorgonzola",
+        "parmigiano",
+        "ricotta"
+    ]
+}
+```
+
+**Result**
+As you can see in the console we have an empty json object response. This is because we need to parse the request body
+to a json object before we can access it's properties. To do that we will add a new middleware in our server file.
+
+Add the code below in the `app.js` file, make sure to restart the server.
+> Server Restart: not necessary if using nodemon or --watch flag.
+
+```js
+
+// parse incoming requests data (optional)
+app.use(express.json())
+
+```
+
+With this in place try again seinging a new post request to our endpoint and see the response.
+
+Now that we have access to the response we can add a new pizza.
+
+### Add a new pizza to the menu.js array
+
+Now we know that the body can be parsed correctly, let's add a new pizza.
+
+Update the `store` method with the following code
+
+```js
+  // create the new pizza object
+  const pizza = {
+    id: Number(menu[menu.length - 1].id + 1), // get the id of the last item in the array and add one
+    name: req.body.name, // get the name from the request body
+    slug: req.body.slug,  // get the slug from the request body
+    image: req.body.image || "https://via.placeholder.com/350x150", // get the image from the request body or use a placehodler
+    ingredients: req.body.ingredients, // get the ingredients from the request body
+  };
+
+  // push it to our menu array
+  // 💡 The update will not persist as the array is in memory.
+  menu.push(pizza)
+
+ 
+  // return the new menu
+  return res.status(201).json({
+    status: 201,
+    data: menu,
+    count: menu.length
+  })
+
+
+```
+
+The code above returns the new menu with a 201 status and the new pizza added to it. Hovever, the new pizza is not persistently added since we are
+not using a database but an array in memory. We will fix that later adding a real database but in the meantime we can use a file system to store our data.
+
+### Update the menu.js file
+
+Thanks to the previous code, we have a new pizza added to the menu. Now let's update the `menu.js` file. We can do that using the
+built-in node module `fs`.
+
+Fist of all we need to import it at the top of our controller file.
+
+```js
+const fs = require('fs')
+```
+
+Now we can update our store method. We need to use the `writeFileSync()` method instead of the `push()` method to make things persistent a little bit.
+
+```js
+// update the js file
+fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(menu, null, 4)}`)
+```
+
+In the code above we used the `writeFileSync()` method to write back our menu array into a file called `menu.js`. The first parameter is the path of the file and the second one is the content that will be written into.
+
+The `JSON.stringify()` method converts an object or any other value in JSON. Note that we passed the third argument to format our JSON properly.
+
+**Final code**
+Our store method now looks like this:
+
+```js
+
+const create = (req, res) => {
+  // add the new pizza to the menu array
+  console.log(req.body);
+
+  // create the new pizza object
+  const pizza = {
+    id: Number(menu[menu.length - 1].id + 1),
+    name: req.body.name,
+    slug: req.body.slug,
+    image: req.body.image || "https://via.placeholder.com/350x150",
+    ingredients: req.body.ingredients,
+  };
+
+  // push it to our menu array
+  // 💡 The update will not persist as the array is in memory.
+  //menu.push(pizza)
+
+  // update the js file
+  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(menu, null, 4)}`)
+  // return the new menu
+  return res.status(201).json({
+    status: 201,
+    data: menu,
+    count: menu.length
+  })
+
+}
+
+```
