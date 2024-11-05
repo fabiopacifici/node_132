@@ -450,15 +450,16 @@ Let's start by creating a new route in our routes file that will handle the inco
 
 
 // routes/pizza.js
-router.post("/pizze", PizzaController.create)
+router.post("/pizze", PizzaController.store)
 
 ```
 
 The route must use the post method to handle the incoming data.
 
-Now let's create a new controller method for this route.
+Now let's create a new controller's method for this route.
 
 ```js
+// /controllers/PizzaController.js
 const store = (req, res) => {
   // add the pizza to our menu array
 }
