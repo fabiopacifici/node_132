@@ -483,7 +483,7 @@ Before this can work we need to export the method, so we need to update the expo
 module.exports = {
   index,
   show,
-  create
+  store
 }
 ```
 
