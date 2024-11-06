@@ -586,7 +586,7 @@ Our store method now looks like this:
 
 ```js
 
-const create = (req, res) => {
+const store = (req, res) => {
   // add the new pizza to the menu array
   console.log(req.body);
 
@@ -615,3 +615,206 @@ const create = (req, res) => {
 }
 
 ```
+
+## CRUD (U) - Update an existing pizza
+
+In this section we will learn how to update a pizza in our system. We are not yet using a db but we are going to use the node filesyetem module to make our life easier and obtain data persistency.
+
+## Step 1. Add the route
+
+The first thing do to is to add a new route to our `/routes/pizza.js` file and use the `put` method to create a route that respond to a PUT requests.
+
+```js
+// routes/pizza.js
+router.put("/:id", PizzaController.update)
+
+```
+
+## Step 2. Add the controller method
+
+Now we need to add a new method in our controller to make things happen and be able to update the pizza.
+
+Inside `controllers/PizzaController` file, add this method:
+
+```js
+
+const update = (req, res) => {
+  // find the pizza by id
+
+
+  // check if the user is updating the correct pizza
+
+
+  // update the pizza object
+
+
+  // update the js file
+
+
+  // return the updated menu item
+
+
+}
+
+```
+
+Inside our method we have outlined the tasks that we need to do in the order they needs to happen. Before talking about the implementation let's export the method from the controller so it can be used by the route we created earlier.
+
+## Step 3. Export the method to the controller
+
+You need to update the exported object in `controllers/PizzaController` file to include this new method otherwise you will not be able to use for the route we created above.
+
+```js
+
+module.exports = {
+  index,
+  show,
+  create,
+  update // <-- add this line
+}
+
+```
+
+Now our app can handle requests made to the following endpoint `/pizza/:id` to update a pizza given its id paramenter.
+
+## Step 4. Implement the update method logic
+
+We have outlined in the previous step what we need to do, now let's recap:
+
+1. find the pizza by id
+2. check if the user is updating the correct pizza
+3. update the pizza object
+4. update the js file
+5. return the updated menu item
+
+Let's start with the fist task, find the pizza by its id parameter and save it in a variable called `pizza`. We can use this variable to check if the user is updating the correct pizza, if not we should return a 404 error since we don't have it in our menu.
+
+**1 Find the pizza**:
+
+```js
+
+const update = (req, res) => {
+  // 1 find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+  // continue...
+}
+
+```
+
+**2 Check if the user is updating the correct pizza**:
+Now that we have the pizza object in our variable let's check if it exists, if not return a 404 error.
+
+```js
+const update = (req, res) => {
+  // 1 find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+  // 2 check if the user is updating the correct pizza
+  if (!pizza) {
+    return res.status(404).json({ error: "No pizza found with that id" })
+  }
+}
+
+```
+
+In the next step we can finally update the pizza item object then we will move to the next step.
+
+```js
+
+const update = (req, res) => {
+  // 1 find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+
+  // 2 check if the user is updating the correct pizza
+  if (!pizza) {
+    return res.status(404).json({ error: "No pizza found with that id" })
+  }
+
+  // 3 update the pizza object
+  pizza.name = req.body.name;
+  pizza.slug = req.body.slug;
+  pizza.image = req.body.image || "https://via.placeholder.com/350x150";
+  pizza.ingredients = req.body.ingredients;
+
+  // continue...
+}
+```
+
+This step is critical because we need to return the updated pizza object back to the user or in our case we want to return the entire list of pizzas.
+
+Before we do that, let's make the pizza update persistent and update out menu file
+
+```js
+
+  // 4. update the js file
+  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(menu, null, 4)}`)
+
+```
+
+The line above will convert our array of pizza objects into a string and then write it back to the menu.js file. Now our menu is updated and we can finally return the updated pizzas to the user.
+
+```js
+  // return the updated menu item
+  res.status(200).json({
+    status: 200,
+    data: menu
+  })
+
+```
+
+Now our `update` method should look like this:
+
+```js
+const update = (req, res) => {
+  // 1 find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+
+  // 2 check if the user is updating the correct pizza
+  if (!pizza) {
+    return res.status(404).json({ error: "No pizza found with that id" })
+  }
+
+  // 3 update the pizza object
+  pizza.name = req.body.name;
+  pizza.slug = req.body.slug;
+  pizza.image = req.body.image || "https://via.placeholder.com/350x150";
+  pizza.ingredients = req.body.ingredients;
+
+
+  // 4 update the js file
+  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(menu, null, 4)}`)
+
+  // 5 return the updated menu item
+  res.status(200).json({
+    status: 200,
+    data: menu
+  })
+
+
+}
+
+```
+
+Our endpoint is ready for testing with Postman. Let's test it out!
+Create a new request in postman and set the method as `PUT` and the URL to `http://localhost:3000/pizze/2`
+
+The dynamic parameter in the URL is replaced by the id of the pizza we want to update.
+In the body tab (in Postman) we can set the body as `raw` and then select `JSON` as the content type.
+
+Try passing this json to the request and press SEND.
+
+```json
+{
+    "name": "Vegan Super Pizza",
+    "slug": "margherita",
+    "type": "classica",
+    "image": "pizze/margherita.webp",
+    "ingredients": [
+        "pomodoro",
+        "mozzarella"
+    ]
+}
+```
+
+If everything is ok, you should see the updated pizza object in the response body togheter with the rest of our menu.
+
+🎊 Congratulations! 🎉

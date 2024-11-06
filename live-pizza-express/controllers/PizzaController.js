@@ -61,9 +61,76 @@ const store = (req, res) => {
 
 }
 
+// update the pizza
+const update = (req, res) => {
+
+  console.log(req.params);
+
+  // find the pizza by id
+  const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
+  // chek if the pizza exists
+  console.log(pizza);
+
+  if (!pizza) {
+    return res.status(404).json({
+      error: `404! Not found`
+    });
+  }
+
+  // update the pizza object
+  pizza.name = req.body.name;
+  pizza.slug = req.body.slug;
+  pizza.type = req.body.type;
+  pizza.image = req.body.image;
+  pizza.ingredients = req.body.ingredients;
+
+  // update the file with the new data
+  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(menu, null, 4)}`)
+
+
+  // return the new pizza array
+  res.json({
+    status: 201,
+    data: menu,
+    counter: menu.length
+  })
+
+}
+
+
+// delete the pizza
+const destroy = (req, res) => {
+  console.log(req.params);
+
+  // find the pizza by id
+  const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
+  console.log(pizza);
+
+  // chek if the pizza exists
+  if (!pizza) {
+    return res.status(404).json({ error: `404! No pizza found with the this id: ${req.params.id}` });
+  }
+
+  // delete the pizza
+  const newMenu = menu.filter(pizza => pizza.id !== Number(req.params.id))
+
+  // update the file with the new data
+  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(newMenu, null, 4)}`)
+
+  // return the new pizza array
+  res.json({
+    status: 201,
+    data: newMenu,
+    counter: newMenu.length
+  })
+}
+
+
 
 module.exports = {
   index,
   show,
-  store
+  store,
+  update,
+  destroy
 }

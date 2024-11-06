@@ -5,15 +5,19 @@ const router = express.Router()
 const PizzaController = require('../controllers/PizzaController.js')
 // define all routes here
 
-// index (prints the entire resource list)
+// CRUD routes
+
+// (R) index (prints the entire resource list)
 router.get('/', PizzaController.index) // /pizze
 
-// show (prints only the single resource) 
+// (R) show (prints only the single resource) 
 router.get('/:id', PizzaController.show) // /pizze/1
 
-//create (creates a new pizza)
+// (C) store (creates a new pizza)
 router.post('/', PizzaController.store) // /pizze
 
+// (U) update (updates an existing pizza)
+router.put('/:id', PizzaController.update) // /pizze/1
 
-// export the router instance
-module.exports = router
+// (D) destroy (deletes a single pizza)
+router.delete('/:id', PizzaController.destroy) // /pizze/1
