@@ -620,7 +620,7 @@ const store = (req, res) => {
 
 In this section we will learn how to update a pizza in our system. We are not yet using a db but we are going to use the node filesyetem module to make our life easier and obtain data persistency.
 
-## Step 1. Add the route
+### Step 1. Add the route
 
 The first thing do to is to add a new route to our `/routes/pizza.js` file and use the `put` method to create a route that respond to a PUT requests.
 
@@ -630,7 +630,7 @@ router.put("/:id", PizzaController.update)
 
 ```
 
-## Step 2. Add the controller method
+### Step 2. Add the controller method
 
 Now we need to add a new method in our controller to make things happen and be able to update the pizza.
 
@@ -660,7 +660,7 @@ const update = (req, res) => {
 
 Inside our method we have outlined the tasks that we need to do in the order they needs to happen. Before talking about the implementation let's export the method from the controller so it can be used by the route we created earlier.
 
-## Step 3. Export the method to the controller
+### Step 3. Export the method to the controller
 
 You need to update the exported object in `controllers/PizzaController` file to include this new method otherwise you will not be able to use for the route we created above.
 
@@ -677,7 +677,7 @@ module.exports = {
 
 Now our app can handle requests made to the following endpoint `/pizza/:id` to update a pizza given its id paramenter.
 
-## Step 4. Implement the update method logic
+### Step 4. Implement the update method logic
 
 We have outlined in the previous step what we need to do, now let's recap:
 
@@ -816,5 +816,191 @@ Try passing this json to the request and press SEND.
 ```
 
 If everything is ok, you should see the updated pizza object in the response body togheter with the rest of our menu.
+
+🎊 Congratulations! 🎉
+
+## CRUD (D) - Delete an existing pizza
+
+In this section we will learn how to update a pizza in our system. We are not yet using a db but we are going to use the node filesyetem module to make our life easier and obtain data persistency.
+
+### Step 1. Add the route
+
+The first thing do to is to add a new route to our `/routes/pizza.js` file and use the `delete` method to create a route that respond to a PUT requests.
+
+```js
+// routes/pizza.js
+router.delete("/:id", PizzaController.destroy)
+
+```
+
+### Step 2. Add the controller method
+
+Now we need to add a new method in our controller to make things happen and be able to delete the pizza.
+
+Inside `controllers/PizzaController` file, add this method:
+
+```js
+
+const destroy = (req, res) => {
+  // find the pizza by id
+
+
+  // check if the user is updating the correct pizza
+
+
+  // remove the pizza from the menu
+
+  
+  // update the js file
+
+
+  // return the updated menu item
+
+
+}
+
+```
+
+Inside our method we have outlined the tasks that we need to do in the order they needs to happen. Before talking about the implementation let's export the method from the controller so it can be used by the route we created earlier.
+
+### Step 3. Export the method to the controller
+
+You need to update the exported object in `controllers/PizzaController` file to include this new method otherwise you will not be able to use for the route we created above.
+
+```js
+
+module.exports = {
+  index,
+  show,
+  create,
+  update,
+  destroy // <-- add this line here
+}
+
+```
+
+> note: we are calling the method `destroy` that we created above instead of `delete` as the method name suggests because in js the word delete is not available.
+
+Now our app can handle requests made to the following endpoint `/pizza/:id` to delete a pizza given its id paramenter.
+
+### Step 4. Implement the update method logic
+
+We have outlined in the previous step what we need to do, now let's recap:
+
+1. find the pizza by id
+2. check if the user is destroying the correct pizza
+3. destroy the pizza object
+4. update the js file
+5. return the updated menu item
+
+Let's start with the fist task, find the pizza by its id parameter and save it in a variable called `pizza`. We can use this variable to check if the user is updating the correct pizza, if not we should return a 404 error since we don't have it in our menu.
+
+**1 Find the pizza**:
+
+```js
+
+const destroy = (req, res) => {
+  // 1 find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+  // continue...
+}
+
+```
+
+**2 Check if the user is updating the correct pizza**:
+Now that we have the pizza object in our variable let's check if it exists, if not return a 404 error.
+
+```js
+const destroy = (req, res) => {
+  // 1 find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+
+  // 2 check if the user is deleting the correct pizza
+  if (!pizza) {
+    return res.status(404).json({ error: "No pizza found with that id" })
+  }
+}
+
+```
+
+In the next step we can delete the array item using filter method and return a new array excluding the deleted item.
+
+```js
+
+const destroy = (req, res) => {
+  // 1 find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+
+  // 2 check if the user is updating the correct pizza
+  if (!pizza) {
+    return res.status(404).json({ error: "No pizza found with that id" })
+  }
+
+  // 3 remove the pizza from the menu
+  const newMenu = menu.filter((pizza) => pizza.id !== parseInt(req.params.id));
+
+  // continue...
+}
+```
+
+This step is critical because we need to return the updated pizza object back to the user or in our case we want to return the entire list of pizzas.
+
+Before we do that, let's make the pizza update persistent and update out menu file
+
+```js
+
+  // 4. update the js file
+  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(newMenu, null, 4)}`)
+
+```
+
+The line above will convert our array of pizza objects into a string and then write it back to the menu.js file. Now our menu is updated and we can finally return the updated pizzas to the user.
+
+```js
+  // return the updated menu item
+  res.status(200).json({
+    status: 200,
+    data: menu
+  })
+
+```
+
+Now our `destroy` method should look like this:
+
+```js
+const destroy = (req, res) => {
+  // find the pizza by id
+  const pizza = menu.find((pizza) => pizza.id === parseInt(req.params.id));
+
+  // check if the user is deleting the correct pizza
+  if (!pizza) {
+    return res.status(404).json({ error: "No pizza found with that id" })
+  }
+
+  // remove the pizza from the menu
+  const newMenu = menu.filter((pizza) => pizza.id !== parseInt(req.params.id));
+
+  // update the js file
+  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(newMenu, null, 4)}`)
+
+  // return the updated menu item
+  res.status(200).json({
+    status: 200,
+    data: newMenu,
+    counter: newMenu.length
+  })
+
+}
+
+
+```
+
+Our endpoint is ready for testing with Postman. Let's test it out!
+Create a new request in postman and set the method as `DELETE` and the URL to `http://localhost:3000/pizze/3`
+
+The dynamic parameter in the URL is replaced by the id of the pizza we want to update.
+This tyme the body of our request will be empty as we don't have any data to send.
+
+If everything is ok, you should see the updated pizza menu in the response body.
 
 🎊 Congratulations! 🎉
