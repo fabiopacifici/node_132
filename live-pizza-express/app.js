@@ -5,7 +5,8 @@ const app = express()
 // import all routes defined in the routes folder
 const PizzeRouter = require('./routes/pizze.js')
 const UsersRouter = require('./routes/users.js')
-
+const notFoundMiddleware = require('./middlewares/notFoundMiddleware.js')
+const logger = require('./middlewares/loggerMiddleware.js')
 // middleware to parse the body of the request
 app.use(express.json())
 
@@ -24,8 +25,29 @@ app.get('/', (req, res) => {
 })
 
 // Pizzeria API
+
+app.use(logger)
+
+/* 
+app.use('/pizze', (req, res, next) => {
+  throw new Error('This is a custom error')
+})
+ */
 app.use('/pizze', PizzeRouter)
 
 app.use('/users', UsersRouter)
 
 
+app.use(notFoundMiddleware);
+
+
+// handle server errors 
+app.use((err, req, res, next) => {
+
+  console.error(err.stack);
+
+  res.status(500).send({
+    status: 500,
+    message: err.message
+  })
+}) 

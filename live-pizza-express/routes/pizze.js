@@ -21,3 +21,5 @@ router.put('/:id', PizzaController.update) // /pizze/1
 
 // (D) destroy (deletes a single pizza)
 router.delete('/:id', PizzaController.destroy) // /pizze/1
+
+module.exports = router

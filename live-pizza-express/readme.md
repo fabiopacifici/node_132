@@ -1004,3 +1004,143 @@ This tyme the body of our request will be empty as we don't have any data to sen
 If everything is ok, you should see the updated pizza menu in the response body.
 
 🎊 Congratulations! 🎉
+
+## Middleware
+
+As you noticed if we try to use a url that does not exist, we will not get a proper 404 error handled by us. This is because node/express do not handle errors. We need to add a middleware for this.
+
+A middleware is a function that has access to the `req` object, the `res` object and the `next` function, that must be invoked to pass the request to the next middleware in the chain. A middleware runs on every request, there are different types of middleware. Middeware can also be associated to a given path, and restrict its actions to run only on that path and those within it.
+
+It can be used to check if the user is authenticated, or to check if the user has access to the resource they are trying to reach but has also many other use cases.
+
+In our case we will catch any route that does not exist and return a 404 error.
+
+Steps:
+
+- Create a new file in the `middlewares` folder called `notFound.js`.
+- add the middleware code below to the file.
+
+```js
+const notFoundMiddleware = (req, res, next) => {
+  res.status(404).send("Sorry can't find that!")
+}
+
+module.exports = notFoundMiddleware;
+
+```
+
+This function has access to three params, the request object, response object and a next function. The next function is used to call the next middleware in the chain. In the middleware function above we haven't called `next` function because we don't want to call any other middleware in this chain, we just want to return a 404 error.
+
+So we informed the client that the response is completed using the `send()` method that ends the application request-response cycle.
+
+After that we export the middleware as `notFoundMiddleware`.
+Now we need to add the middleware to our app.js file.
+
+## Add the middleware to the app.js file
+
+Open the `app.js` file and scroll to the bottom of the file. Our middleware needs to be added after the last route of our app so it will be executed if none of the routes match.
+
+Import the middleware at the top of your app.js file
+
+```js
+const notFoundMiddleware = require('./middleware/notFoundMiddleware.js')
+```
+
+Add this at the bottom of the app.js file.
+
+```js
+
+// this needs to be the last call in the app, right after all the routes are defined.
+app.use(notFoundMiddleware);
+```
+
+## Add the custom logger middleware to the app.js file
+
+Now that we can handle 404 errors, let's add a custom middleware logger that will print in the console every time a request is made to our server plus some key information.
+
+Create a new file in the middlewares folder called `loggerMiddleware.js`.
+
+```js
+// create a miggleware function
+// notice the third parameter of the function, it's a next function call.
+const loggerMiddleware = (req, res, next) => {
+  const now = new Date().toString();
+  console.error(`
+    Date: ${now} 
+    Method: ${req.method} 
+    URL: ${req.url}`);
+
+  // we need to call next to avoid the request is hanging forever.
+  next();
+
+}
+// export the function created.
+module.exports = loggerMiddleware;
+```
+
+Now that we have a custom middleware, let's add it to our app.js file.
+
+**import** the middleware at the top of your app.js file
+
+```js
+const loggerMiddleware = require('./middleware/loggerMiddleware')
+
+```
+
+next use it. This middleware will be executed before every request is made to the /pizze endpoints.
+
+```js
+app.use('/pizze', loggerMiddleware)
+```
+
+🎊 Congratulations! You have created your first custom middleware.
+
+## Lets add a custom error handler middleware to the app.js file
+
+Now let's complete our project by handling also potential server errors happening in our endpoints.
+
+### Trigger a server error
+
+Before we do that, let's trigger a server error and then see what happens.
+To do that we will add a route based middleware to our app.js file.
+We will place it before our routes definition.
+
+```js
+
+// middleware to trigger a 500 error
+app.use('/pizze', (req, res, next) => {
+  throw new Error("You broke everything dude! 💥");
+}); 
+
+// Your routes here
+// ...
+```
+
+> NOTE: ⚠️ place this before all routes `/pizze` to test the error handling middleware that we will create soon, but remember to removed the code above after we tested the error handling middleware otherwise our endpoints will be broken.
+
+### Lets create a custom error handler middleware
+
+Now let's create a custom error handler middleware. This middleware will be executed when an error is triggered after the client requests any our our endpoints.
+
+> NOTE: Put this middleware at the bottom of your app.js file.
+> nothing should be after it because it will not work.
+
+```js
+
+// Last middleware to handle errors
+app.use((err, req, res, next) => {
+  console.log("Error: ", err.message);
+  // this prints the stack trace of the error
+  console.error(err.stack);
+  res.status(500).send({
+    message: "Something went wrong",
+    error: err.message
+  })
+});
+
+```
+
+Now when we try to send a request to any of our endpoints prefixed with `/pizze` we should see the error message and the stack trace.
+
+This completes the chapter about error handling.
+🎊 Congratulations!

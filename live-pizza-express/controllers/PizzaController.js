@@ -16,7 +16,7 @@ const index = (req, res) => {
 
 const show = (req, res) => {
   //console.log(req.params.id);
-  console.log(req);
+  //console.log(req);
   const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
   //console.log(pizza);
 
