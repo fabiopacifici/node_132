@@ -1036,7 +1036,7 @@ So we informed the client that the response is completed using the `send()` meth
 After that we export the middleware as `notFoundMiddleware`.
 Now we need to add the middleware to our app.js file.
 
-## Add the middleware to the app.js file
+### Add the middleware to the app.js file
 
 Open the `app.js` file and scroll to the bottom of the file. Our middleware needs to be added after the last route of our app so it will be executed if none of the routes match.
 
@@ -1054,7 +1054,7 @@ Add this at the bottom of the app.js file.
 app.use(notFoundMiddleware);
 ```
 
-## Add the custom logger middleware to the app.js file
+### Add the custom logger middleware to the app.js file
 
 Now that we can handle 404 errors, let's add a custom middleware logger that will print in the console every time a request is made to our server plus some key information.
 
@@ -1095,7 +1095,7 @@ app.use('/pizze', loggerMiddleware)
 
 🎊 Congratulations! You have created your first custom middleware.
 
-## Lets add a custom error handler middleware to the app.js file
+### Lets add a custom error handler middleware to the app.js file
 
 Now let's complete our project by handling also potential server errors happening in our endpoints.
 
