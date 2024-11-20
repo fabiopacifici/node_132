@@ -10,6 +10,10 @@ const logger = require('./middlewares/loggerMiddleware.js')
 // middleware to parse the body of the request
 app.use(express.json())
 
+app.use(express.static('public'))
+
+
+
 const HOST = process.env.HOST
 const PORT = process.env.PORT
 
