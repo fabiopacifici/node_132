@@ -40,6 +40,9 @@ const store = (req, res) => {
   const pizza = {
     id: menu[menu.length - 1].id + 1,
     name: req.body.name,
+    description: req.body.description,
+    is_available: req.body.is_available,
+    price: req.body.price,
     slug: req.body.slug,
     type: req.body.type,
     image: req.body.image,

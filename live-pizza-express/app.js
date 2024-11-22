@@ -1,6 +1,7 @@
 // the package dotenv is no longer
 //require('dotenv').config()
 const express = require('express')
+const cors = require('cors')
 const app = express()
 // import all routes defined in the routes folder
 const PizzeRouter = require('./routes/pizze.js')
@@ -9,7 +10,7 @@ const notFoundMiddleware = require('./middlewares/notFoundMiddleware.js')
 const logger = require('./middlewares/loggerMiddleware.js')
 // middleware to parse the body of the request
 app.use(express.json())
-
+app.use(cors())
 app.use(express.static('public'))
 
 
