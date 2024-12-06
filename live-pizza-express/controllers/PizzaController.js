@@ -6,7 +6,6 @@ const connection = require('../db/connection')
 
 const index = (req, res) => {
 
-
   // prepare a sql query to get all pizzas from the db
   const sql = 'SELECT * FROM pizzas'
   // execute the query
@@ -36,6 +35,7 @@ const show = (req, res) => {
     // handle the 404 error
     if (!results[0]) return res.status(404).json({ error: `404! Not found` })
 
+    // perpare the response data
     const responseData = {
       data: results[0],
     }
@@ -46,21 +46,6 @@ const show = (req, res) => {
     res.status(200).json(responseData);
 
   })
-
-  //console.log(req);
-  /*  const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
-   //console.log(pizza);
- 
-   if (!pizza) {
-     return res.status(404).json({
-       error: `404! Not found`
-     })
-   }
-   return res.status(200).json({
-     data: pizza
-   }) */
-
-
 
 } // Closing parenthesis of show function
 
