@@ -9,7 +9,7 @@ const index = (req, res) => {
 
   // prepare a sql query to get all pizzas from the db
   const sql = 'SELECT * FROM pizzas'
-
+  // execute the query
   connection.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err });
 
@@ -20,16 +20,6 @@ const index = (req, res) => {
 
     res.status(200).json(responseData);
   })
-
-  // create the response object you want to send
-  /*   const responseData = {
-      data: menu,
-      counter: menu.length
-    } */
-
-  // send the response with the 200 status code
-  //res.status(200).json(responseData)
-
 }
 
 
