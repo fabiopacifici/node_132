@@ -1,15 +1,34 @@
 const menu = require('../db/menu.js')
 const fs = require('fs')
+const connection = require('../db/connection')
+
+
+
 const index = (req, res) => {
 
+
+  // prepare a sql query to get all pizzas from the db
+  const sql = 'SELECT * FROM pizzas'
+
+  connection.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+
+    const responseData = {
+      data: results,
+      counter: results.length
+    }
+
+    res.status(200).json(responseData);
+  })
+
   // create the response object you want to send
-  const responseData = {
-    data: menu,
-    counter: menu.length
-  }
+  /*   const responseData = {
+      data: menu,
+      counter: menu.length
+    } */
 
   // send the response with the 200 status code
-  res.status(200).json(responseData)
+  //res.status(200).json(responseData)
 
 }
 
