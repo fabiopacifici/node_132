@@ -141,33 +141,6 @@ const destroy = (req, res) => {
     return res.json({ status: 204, affectedRows: results.affectedRows })
 
   })
-
-
-
-
-
-
-  /*  // find the pizza by id
-   const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
-   console.log(pizza);
- 
-   // chek if the pizza exists
-   if (!pizza) {
-     return res.status(404).json({ error: `404! No pizza found with the this id: ${req.params.id}` });
-   }
- 
-   // delete the pizza
-   const newMenu = menu.filter(pizza => pizza.id !== Number(req.params.id))
- 
-   // update the file with the new data
-   fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(newMenu, null, 4)}`)
- 
-   // return the new pizza array
-   res.json({
-     status: 201,
-     data: newMenu,
-     counter: newMenu.length
-   }) */
 }
 
 
