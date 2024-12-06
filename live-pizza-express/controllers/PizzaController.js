@@ -25,20 +25,44 @@ const index = (req, res) => {
 
 const show = (req, res) => {
   //console.log(req.params.id);
-  //console.log(req);
-  const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
-  //console.log(pizza);
+  const id = req.params.id;
+  console.log(id);
 
-  if (!pizza) {
-    return res.status(404).json({
-      error: `404! Not found`
-    })
-  }
-  return res.status(200).json({
-    data: pizza
+  // prepare the sql query
+  const sql = 'SELECT * FROM pizzas WHERE id=?'
+
+  connection.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    // handle the 404 error
+    if (!results[0]) return res.status(404).json({ error: `404! Not found` })
+
+    const responseData = {
+      data: results[0],
+    }
+
+    console.log(responseData);
+
+    // return the pizza
+    res.status(200).json(responseData);
+
   })
 
-}
+  //console.log(req);
+  /*  const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
+   //console.log(pizza);
+ 
+   if (!pizza) {
+     return res.status(404).json({
+       error: `404! Not found`
+     })
+   }
+   return res.status(200).json({
+     data: pizza
+   }) */
+
+
+
+} // Closing parenthesis of show function
 
 
 const store = (req, res) => {
