@@ -27,23 +27,47 @@ const show = (req, res) => {
   const id = req.params.id;
   console.log(id);
 
-  // prepare the sql query
+  // prepare the sql query to get the pizza by its id
   const sql = 'SELECT * FROM pizzas WHERE id=?'
 
+  // prepare another query to get all the ingredients associated with that pizza
+  const ingredientsSql = `
+    SELECT ingredients.*
+    FROM ingredients
+    JOIN pizza_ingredients ON ingredients.id = pizza_ingredients.ingredient_id
+    WHERE pizza_ingredients.pizza_id = ?
+  `;
+
+
+  // exectute the first query to get the pizza by its id
   connection.query(sql, [id], (err, results) => {
     if (err) return res.status(500).json({ error: err });
     // handle the 404 error
     if (!results[0]) return res.status(404).json({ error: `404! Not found` })
 
     // perpare the response data
-    const responseData = {
-      data: results[0],
-    }
+    const pizza = results[0]
+    console.log('Pizza obj', pizza);
 
-    console.log(responseData);
+    // execute the second query to get all the ingredients associated with that pizza
+    connection.query(ingredientsSql, [id], (err, ingrediensResults) => {
+      // handle 500 error
+      if (err) return res.status(500).json({ error: err })
+      console.log('👉', ingrediensResults);
 
-    // return the pizza
-    res.status(200).json(responseData);
+      pizza.ingredients = ingrediensResults;
+
+
+      const responseData = {
+        data: pizza,
+      }
+
+      console.log(responseData);
+
+      // return the pizza
+      res.status(200).json(responseData);
+
+    })
 
   })
 
