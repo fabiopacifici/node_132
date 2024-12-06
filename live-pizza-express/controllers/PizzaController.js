@@ -121,29 +121,53 @@ const update = (req, res) => {
 
 // delete the pizza
 const destroy = (req, res) => {
+
   console.log(req.params);
 
-  // find the pizza by id
-  const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
-  console.log(pizza);
 
-  // chek if the pizza exists
-  if (!pizza) {
-    return res.status(404).json({ error: `404! No pizza found with the this id: ${req.params.id}` });
-  }
+  //1. take the resource id from the request
+  const id = req.params.id
 
-  // delete the pizza
-  const newMenu = menu.filter(pizza => pizza.id !== Number(req.params.id))
+  //2. prepare the sql query to delete the record form the db
+  const sql = 'DELETE FROM pizzas WHERE id=?'
 
-  // update the file with the new data
-  fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(newMenu, null, 4)}`)
+  //3. perform the prepared statement query
+  connection.query(sql, [id], (err, results) => {
+    console.log(err, results);
+    if (err) return res.status(500).json({ error: err })
+    //4. handle a 404 error if the record is not found
+    if (results.affectedRows === 0) return res.status(404).json({ error: `404! No pizza found with the this id: ${id}` })
 
-  // return the new pizza array
-  res.json({
-    status: 201,
-    data: newMenu,
-    counter: newMenu.length
+    return res.json({ status: 204, affectedRows: results.affectedRows })
+
   })
+
+
+
+
+
+
+  /*  // find the pizza by id
+   const pizza = menu.find(pizza => pizza.id === Number(req.params.id))
+   console.log(pizza);
+ 
+   // chek if the pizza exists
+   if (!pizza) {
+     return res.status(404).json({ error: `404! No pizza found with the this id: ${req.params.id}` });
+   }
+ 
+   // delete the pizza
+   const newMenu = menu.filter(pizza => pizza.id !== Number(req.params.id))
+ 
+   // update the file with the new data
+   fs.writeFileSync('./db/menu.js', `module.exports = ${JSON.stringify(newMenu, null, 4)}`)
+ 
+   // return the new pizza array
+   res.json({
+     status: 201,
+     data: newMenu,
+     counter: newMenu.length
+   }) */
 }
 
 
